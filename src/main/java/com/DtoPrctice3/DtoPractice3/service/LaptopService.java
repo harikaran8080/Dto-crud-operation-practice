@@ -5,12 +5,20 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.DtoPrctice3.DtoPractice3.dto.LaptopDto;
+import com.DtoPrctice3.DtoPractice3.dto.PaginationResponse;
 import com.DtoPrctice3.DtoPractice3.entity.Laptops;
 import com.DtoPrctice3.DtoPractice3.repository.LaptopRepository;
+
+import jakarta.annotation.Resource;
 
 @Service
 public class LaptopService implements ServiceImplement{
@@ -95,6 +103,49 @@ public class LaptopService implements ServiceImplement{
 		laptopRepository.deleteById(laptopNo);
 		return "Delete Panniyachu kilampu";
 	}
+	
+	
+//                                 \************/	
+//***********************************PAGINATION************************************
+//                                  ************	
+	
+	@Override
+	public ResponseEntity<PaginationResponse<Laptops>> resource(int page, int size) {
+		Pageable pageable =PageRequest.of(page, size);
+		Page<Laptops>resourcespage=laptopRepository.findAll(pageable);
+		 PaginationResponse<Laptops> response =new PaginationResponse<Laptops>();
+		 response.setContent(resourcespage.getContent());
+		 response.setPageNo(resourcespage.getNumber());
+		 response.setPageSize(resourcespage.getSize());
+		 response.setTotalElements(resourcespage.getTotalElements());
+		 response.setTotalPage(resourcespage.getTotalPages());
+		 response.setLast(resourcespage.isLast());
+		return new ResponseEntity<PaginationResponse<Laptops>>(response, HttpStatus.OK);
+	}
+
+	@Override
+	public Page<Laptops> getvalues(int page, int size) {
+		Pageable pageable=PageRequest.of(page, size);
+		return laptopRepository.findAll(pageable);
+	}
+
+	@Override
+	public PaginationResponse<Laptops> geter(int page, int size) {
+		Pageable pageable=PageRequest.of(page, size);
+		Page<Laptops>page2=laptopRepository.findAll(pageable);
+		PaginationResponse<Laptops>paginationResponse=new PaginationResponse<Laptops>();
+		paginationResponse.setContent(page2.getContent());
+		paginationResponse.setLast(page2.isLast());
+		paginationResponse.setPageNo(page2.getTotalPages());
+		paginationResponse.setPageSize(page2.getSize());
+		paginationResponse.setTotalElements(page2.getTotalElements());
+		paginationResponse.setTotalPage(page2.getTotalPages());
+		return paginationResponse;
+		
+
+		
+	}
+
 
 
 	
